@@ -5,3 +5,5 @@ class Customer{
         this.coordinates = coordinates;
     }
 }
+
+module.exports = Customer;
