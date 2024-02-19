@@ -4,9 +4,5 @@ class Drone {
       this.destination = null;
       this.status = 'idle';
     }
-
-    calculateTimeToDestination(destination) {
-    console.log(destination);
-    }
 }
 
