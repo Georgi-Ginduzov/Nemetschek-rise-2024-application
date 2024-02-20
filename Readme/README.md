@@ -7,9 +7,9 @@ Georgi Ginduzov
 georgi.ginduzov17d@gmail.com
 
 ## Description
+Imaginary I have split the map by calculating the half of their coordinates sum. Therefore the map is split into two parts considering the warehouse's location. In that way before an order is added it is added to a certain warehouse which will provide drone for its delivery. I have chosen this solution due to the fact that it will be chosen the warehouse which is closest to the delivery destination and therefore it will be more productive in general to make deliveries from that warehouse. 
+    - a way I can optimize this process is to include a condition in which when a new order is added the ballance between the warehouses' pending orders is checked and if one of them has too much pending orders the other(less engaged warehouse) starts making some of the other's pending deliveries
 
-
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
 
 ## Badges
 On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
