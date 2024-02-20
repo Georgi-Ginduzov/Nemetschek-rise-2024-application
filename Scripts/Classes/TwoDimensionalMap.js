@@ -5,7 +5,7 @@ class TwoDimensionalMap{
     constructor(coordinates){
         this.coordinates = coordinates;
         this.warehouses = [];
-        this.customers = [];
+        this.customers = new Map();
     }
 
     addWarehouse(x, y, name){
@@ -13,7 +13,11 @@ class TwoDimensionalMap{
     }
 
     addCustomer(id, name, coordinates){
-        this.customers.push(new Customer(id, name, coordinates));
+        this.customers.set(id, {name, coordinates});
+    }
+
+    getCustomerCoordinates(id){
+        return this.customers.get(id).coordinates;
     }
 }
 
