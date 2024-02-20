@@ -38,6 +38,10 @@ I have decided to go for this structure because of several reasons:
     5. Product
         * Name - name of a product given by json input file
         * Count - to be modified when initialized and added in an order
+    6. Customer (all of it data is given by json input file)
+        * Id - to be identifiable by the warehouses drones
+        * Name - because of the notification a drone sends if it doesnt wait the customer to takes its order
+        * Coordinates - a list of x and y coordinates
 
     
 Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
