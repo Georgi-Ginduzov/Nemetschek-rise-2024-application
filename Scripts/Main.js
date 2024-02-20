@@ -1,5 +1,5 @@
-const Engine = require('./Classes/Engine.js');
+const SynchronousImplementationEngine = require('./Engines/SynchronousImplementationEngine.js');
 
-let engine = new Engine();
+let engine = new SynchronousImplementationEngine();
 
-engine.start();
+engine.run();
