@@ -1,12 +1,21 @@
-const Product = require("./Products");
+const Product = require("./Product");
 
 class Order{
     constructor(customerId, productList){
         this.customerId = customerId;
-        this.productList = productList.map(product => new Product(product.name, product.count));
+        this.productList = [];
     }
 
-    addOrder
+    addProduct(name, count){
+        if(this.productList.has(name)){
+            // Logic to increase product's quantity if the next order was soon made after the previous one
+            console.log("Product already exists");
+        }
+        else{
+            this.productList.set(name, this.productList.get(name) + count);
+        }
+        this.productList.set(name, count);
+    }
 }
 
 module.exports = Order;
