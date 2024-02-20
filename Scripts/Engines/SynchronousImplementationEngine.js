@@ -19,12 +19,8 @@ class SynchronousImplementationEngine{
         return warehouseMedian;
     }
 
-    chooseWarehouse(map, customerCoordinates){
-        const customerCoordinatesSum = customerCoordinates[0] + customerCoordinates[1];
-
-        const warehouseMedian = this.calculateWarehouseMedian(map);
-
-        return customerCoordinatesSum <= warehouseMedian ? 0 : 1;
+    chooseWarehouse(x, y, warehouseMedian){
+        return x + y <= warehouseMedian ? 0 : 1;
     }
 
     assignValuesFromJson(address){
@@ -44,26 +40,57 @@ class SynchronousImplementationEngine{
         for (let orderData of data['orders']) {            
             let id = orderData['customerId']
             let productList = orderData['productList'];
+
             const customerCoordinates = map.getCustomerCoordinates(id);
-            map.warehouses[this.chooseWarehouse(map, customerCoordinates)].addOrder(id, productList);
+            
+            const warehouseMedian = this.calculateWarehouseMedian(map);
+            map.warehouses[this.chooseWarehouse(customerCoordinates.x, customerCoordinates.y, warehouseMedian)].addOrder(id, productList);
         }
 
         // To Do - implement product addition logic
-        /*for(let product of data['products']){
-            map.warehouses[0].addProduct(product['name'], product['count']);
-            map.warehouses[1].addProduct(product['name'], product['count']);
-        }*/
-
         return map;
+    }
+
+    calculateDeliveryTime(order){
+
+    }
+
+    absoluteValue(number){
+        return number < 0 ? number * -1 : number;
+    }
+
+    deliverOrder(warehouse, customerCoordinates){// To Do: finish the implementation of the method
+        let time = 0;
+        for(let order of warehouse.orders){
+            time += 5;//waiting to pack
+            console.log("Waiting to pack:");
+            console.log(time);
+
+            time += this.absoluteValue(customerCoordinates.x - warehouse.x) + this.absoluteValue(customerCoordinates.y - warehouse.y);
+            
+            console.log("Delivered to customer");
+            console.log(time);
+
+            return time;
+        }
     }
 
     run(){
         const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForBandA.json');
 
-        console.log(twoDimentionalMap);
-        // To do - implement movement logic
-
+        let time = 0;
         
+        time += this.deliverOrder(twoDimentionalMap.warehouses[0], twoDimentionalMap.getCustomerCoordinates(1));
+        for(let order of twoDimentionalMap.warehouses[1].orders){
+            time += 5;//waiting to pack
+            console.log("Waiting to pack:");
+            console.log(time);
+
+            const customerCoordinates = twoDimentionalMap.getCustomerCoordinates(order.customerId);
+            time += this.absoluteValue(customerCoordinates.x - twoDimentionalMap.warehouses[1].x) + this.absoluteValue(customerCoordinates.y - twoDimentionalMap.warehouses[1].y);
+            console.log("Delivered to customer");
+            console.log(time);
+        }
         
     }
 }
