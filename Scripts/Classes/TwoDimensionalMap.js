@@ -11,7 +11,7 @@ class TwoDimensionalMap{
     addWarehouse(x, y, name){
         this.warehouses.push(new Warehouse(x, y, name));
     }
-
+    
     addCustomer(id, name, coordinates){
         this.customers.set(id, {name, coordinates});
     }
