@@ -41,56 +41,29 @@ class SynchronousImplementationEngine{
             let id = orderData['customerId']
             let productList = orderData['productList'];
 
+            //console.log("Getting customer coordinates:");
             const customerCoordinates = map.getCustomerCoordinates(id);
-            
+            //console.log(customerCoordinates);
+
             const warehouseMedian = this.calculateWarehouseMedian(map);
-            map.warehouses[this.chooseWarehouse(customerCoordinates.x, customerCoordinates.y, warehouseMedian)].addOrder(id, productList);
+
+            map.warehouses[this.chooseWarehouse(customerCoordinates.x, customerCoordinates.y, warehouseMedian)].addOrder(id, productList, customerCoordinates);
         }
 
         // To Do - implement product addition logic
         return map;
     }
 
-    calculateDeliveryTime(order){
-
-    }
-
-    absoluteValue(number){
-        return number < 0 ? number * -1 : number;
-    }
-
-    deliverOrder(warehouse, customerCoordinates){// To Do: finish the implementation of the method
-        let time = 0;
-        for(let order of warehouse.orders){
-            time += 5;//waiting to pack
-            console.log("Waiting to pack:");
-            console.log(time);
-
-            time += this.absoluteValue(customerCoordinates.x - warehouse.x) + this.absoluteValue(customerCoordinates.y - warehouse.y);
-            
-            console.log("Delivered to customer");
-            console.log(time);
-
-            return time;
-        }
-    }
-
     run(){
         const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForBandA.json');
 
         let time = 0;
+        const packagingTime = 5;
         
-        time += this.deliverOrder(twoDimentionalMap.warehouses[0], twoDimentionalMap.getCustomerCoordinates(1));
-        for(let order of twoDimentionalMap.warehouses[1].orders){
-            time += 5;//waiting to pack
-            console.log("Waiting to pack:");
-            console.log(time);
-
-            const customerCoordinates = twoDimentionalMap.getCustomerCoordinates(order.customerId);
-            time += this.absoluteValue(customerCoordinates.x - twoDimentionalMap.warehouses[1].x) + this.absoluteValue(customerCoordinates.y - twoDimentionalMap.warehouses[1].y);
-            console.log("Delivered to customer");
-            console.log(time);
-        }
+        Promise.all([
+            twoDimentionalMap.warehouses[0].processOrders(),
+            twoDimentionalMap.warehouses[1].processOrders()
+        ]).then(() => console.log('All orders delivered!'));
         
     }
 }
