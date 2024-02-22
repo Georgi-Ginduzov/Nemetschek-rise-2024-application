@@ -1,8 +1,7 @@
 class Drone {
-    constructor(currentLocation) {
-      this.currentLocation = currentLocation;
-      this.destination = null;
-      this.status = 'idle';
+    constructor() {
+        this.capacity = capacity;
+        this.consumption = consumption;
     }
 }
 
