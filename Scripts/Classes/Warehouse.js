@@ -24,34 +24,34 @@ class Warehouse {
     }
 
     async processOrders(packagingTime) {
+        console.log(`Begin delivering orders`);
 
-        let timeCounter = 0;
-        
+        let totalTime = 0;
         for(let orderDetails of this.orders){
-            timeCounter = await this.deliverOrder(orderDetails, timeCounter, packagingTime);
+            totalTime = await this.deliverOrder(orderDetails, totalTime, packagingTime);
             console.log("Returned to warehouse!");
-            console.log(timeCounter);
         }
-        return await timeCounter;
+
+        return totalTime;
     }
 
-    deliverOrder(orderDetails, timeCounter, packagingTime) {
+    deliverOrder(orderDetails, totalTime, packagingTime) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                timeCounter += packagingTime; 
+                totalTime += packagingTime; 
 
-                console.log("Packing...");
+                console.log("Waiting to pack:");
                 
                 const customerCoordinates = orderDetails[1].customerCoordinates;
                 console.log(customerCoordinates);
                 
                 const deliveryTime = this.absoluteValue(customerCoordinates.x - this.x) + this.absoluteValue(customerCoordinates.y - this.y);
-                timeCounter += deliveryTime;
+                totalTime += deliveryTime;
                 console.log("Delivered to customer");
 
                 console.log("Returning to warehouse");
-                timeCounter += deliveryTime;
-                resolve(timeCounter);
+                totalTime += deliveryTime;
+                resolve(totalTime);
             }, 1000);
         });
         
