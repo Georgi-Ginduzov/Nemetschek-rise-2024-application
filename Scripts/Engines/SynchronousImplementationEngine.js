@@ -41,13 +41,13 @@ class SynchronousImplementationEngine{
             let id = orderData['customerId']
             let productList = orderData['productList'];
 
-            //console.log("Getting customer coordinates:");
-            const customerCoordinates = map.getCustomerCoordinates(id);
-            //console.log(customerCoordinates);
-
+            const customer = map.customers.get(id);
+            console.log(customer);
+            const customerCoordinates = customer.coordinates;
+            
             const warehouseMedian = this.calculateWarehouseMedian(map);
 
-            map.warehouses[this.chooseWarehouse(customerCoordinates.x, customerCoordinates.y, warehouseMedian)].addOrder(id, productList, customerCoordinates);
+            map.warehouses[this.chooseWarehouse(customerCoordinates.x, customerCoordinates.y, warehouseMedian)].addOrder(id, productList, customer);
         }
 
         // To Do - implement product addition logic
@@ -55,7 +55,7 @@ class SynchronousImplementationEngine{
     }
 
     run(){
-        const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForBandA.json');
+        const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForC.json');
 
         const packagingTime = 5;
 
@@ -65,9 +65,17 @@ class SynchronousImplementationEngine{
         ]).then((warehousesTotalDeliveryTime) => {
             let totalDeliveryTime = 0;
             for(let warehouseDeliveryTime of warehousesTotalDeliveryTime){
-                totalTime += warehouseDeliveryTime;
+                totalDeliveryTime += warehouseDeliveryTime;
             }
-            console.log(`Delivered all orders.\nTotal time: ${totalDeliveryTime}`);
+            console.log(`Delivered all orders!\nTotal time: ${totalDeliveryTime}`);
+            
+            // To Do - reduce last promise return to warehouse time
+            /*let lastPromise = warehousesTotalDeliveryTime[warehousesTotalDeliveryTime.length-1];
+            lastDeliveryTime = (lastPromise - packagingTime) / 2;
+
+            totalDeliveryTime -= lastPromise;
+
+            console.log(`Last promise resolved with: ${lastPromise}`);*/
         });
         
         console.log();
