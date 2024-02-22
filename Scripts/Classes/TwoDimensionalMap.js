@@ -13,11 +13,12 @@ class TwoDimensionalMap{
     }
     
     addCustomer(id, name, coordinates){
-        this.customers.set(id, {name, coordinates});
+        const customer = new Customer(id, name, coordinates);
+        this.customers.set(id, customer);
     }
 
-    getCustomerCoordinates(id){
-        return this.customers.get(id).coordinates;
+    getCustomerNameAndCoordinates(id){
+        return this.customers.get(id);
     }
 }
 
