@@ -1,5 +1,5 @@
-const { promises } = require("dns");
 const Order = require("./Order");
+
 
 class Warehouse {
     constructor(x, y, name) {
@@ -8,11 +8,11 @@ class Warehouse {
         this.name = name;
         this.products = [];
         this.orders = [];
-        //this.drone = drone;
+        this.drone = [];
     }
 
-    addOrder(customerId, productList, customerCoordinates) {
-        this.orders.push([customerId, {productList, customerCoordinates}]);
+    addOrder(customerId, productList, customer) {
+        this.orders.push(new Order([customerId, {productList, customer}]));
     }
 
     getOrder(orderNumber){
@@ -27,6 +27,7 @@ class Warehouse {
         console.log(`Begin delivering orders`);
 
         let totalTime = 0;
+        
         for(let orderDetails of this.orders){
             totalTime = await this.deliverOrder(orderDetails, totalTime, packagingTime);
             console.log("Returned to warehouse!");
@@ -42,17 +43,19 @@ class Warehouse {
 
                 console.log("Waiting to pack:");
                 
-                const customerCoordinates = orderDetails[1].customerCoordinates;
+                const customerCoordinates = orderDetails.customer.coordinates;
                 console.log(customerCoordinates);
                 
                 const deliveryTime = this.absoluteValue(customerCoordinates.x - this.x) + this.absoluteValue(customerCoordinates.y - this.y);
                 totalTime += deliveryTime;
-                console.log("Delivered to customer");
+                console.log("Notification to: ", orderDetails.customer.name);
+                console.log("Order delivered!");
 
                 console.log("Returning to warehouse");
+                
                 totalTime += deliveryTime;
                 resolve(totalTime);
-            }, 1000);
+            }, 100);
         });
         
         // To do: reject
