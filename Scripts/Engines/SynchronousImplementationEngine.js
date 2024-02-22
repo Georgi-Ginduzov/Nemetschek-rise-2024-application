@@ -53,18 +53,20 @@ class SynchronousImplementationEngine{
         // To Do - implement product addition logic
         return map;
     }
-
+    
     run(){
         const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForBandA.json');
 
-        let time = 0;
         const packagingTime = 5;
-        
+
         Promise.all([
-            twoDimentionalMap.warehouses[0].processOrders(),
-            twoDimentionalMap.warehouses[1].processOrders()
-        ]).then(() => console.log('All orders delivered!'));
+            twoDimentionalMap.warehouses[0].processOrders(packagingTime),
+            twoDimentionalMap.warehouses[1].processOrders( packagingTime)
+        ]).then((values) => {
+            console.log(`Delivered all orders.\nTotal time: ${values}`);
+        });
         
+        console.log();
     }
 }
 module.exports = SynchronousImplementationEngine;

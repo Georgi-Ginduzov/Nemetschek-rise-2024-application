@@ -1,3 +1,4 @@
+const { promises } = require("dns");
 const Order = require("./Order");
 
 class Warehouse {
@@ -6,12 +7,12 @@ class Warehouse {
         this.y = y;
         this.name = name;
         this.products = [];
-        this.orders = new Map();
+        this.orders = [];
         //this.drone = drone;
     }
 
     addOrder(customerId, productList, customerCoordinates) {
-        this.orders.set(customerId, {productList, customerCoordinates});
+        this.orders.push([customerId, {productList, customerCoordinates}]);
     }
 
     getOrder(orderNumber){
@@ -22,32 +23,38 @@ class Warehouse {
         return number < 0 ? number * -1 : number;
     }
 
-    async processOrders(){
-        for(let [customerId, orderDetails] of this.orders){
-            await this.deliverOrder(orderDetails);
+    async processOrders(packagingTime) {
+
+        let timeCounter = 0;
+        
+        for(let orderDetails of this.orders){
+            timeCounter = await this.deliverOrder(orderDetails, timeCounter, packagingTime);
+            console.log("Returned to warehouse!");
+            console.log(timeCounter);
         }
+        return await timeCounter;
     }
 
-    deliverOrder(orderDetails) {
+    deliverOrder(orderDetails, timeCounter, packagingTime) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                let time = 0;
-                time += 5; // waiting to pack
-                console.log("Waiting to pack:");
-                console.log(time);
+                timeCounter += packagingTime; 
+
+                console.log("Packing...");
                 
-                const customerCoordinates = orderDetails.customerCoordinates;
+                const customerCoordinates = orderDetails[1].customerCoordinates;
                 console.log(customerCoordinates);
-                console.log(`Customer coordinates: ${customerCoordinates.x}, ${customerCoordinates.y}`)
-    
-                time += this.absoluteValue(customerCoordinates.x - this.x) + this.absoluteValue(customerCoordinates.y - this.y);
-                console.log("Delivered to customer");
-                console.log(time);
                 
-                resolve();
+                const deliveryTime = this.absoluteValue(customerCoordinates.x - this.x) + this.absoluteValue(customerCoordinates.y - this.y);
+                timeCounter += deliveryTime;
+                console.log("Delivered to customer");
+
+                console.log("Returning to warehouse");
+                timeCounter += deliveryTime;
+                resolve(timeCounter);
             }, 1000);
         });
-
+        
         // To do: reject
     }
     
