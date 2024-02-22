@@ -1,9 +1,10 @@
 const Product = require("./Product");
 
 class Order{
-    constructor(customerId, productList){
+    constructor([customerId, {productList, customer}]){
         this.customerId = customerId;
-        this.productList = [];
+        this.productList = [];// productList|| []
+        this.customer = customer;
     }
 
     addProduct(name, count){
