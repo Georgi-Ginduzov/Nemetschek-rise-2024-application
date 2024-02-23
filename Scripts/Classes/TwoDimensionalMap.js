@@ -20,6 +20,14 @@ class TwoDimensionalMap{
     getCustomerNameAndCoordinates(id){
         return this.customers.get(id);
     }
+
+    getTotalDrones(){
+        let totalDrones = 0;
+        for(let warehouse of this.warehouses){
+            totalDrones += warehouse.drones.length;
+        }
+        return totalDrones;
+    }
 }
 
 module.exports = TwoDimensionalMap;

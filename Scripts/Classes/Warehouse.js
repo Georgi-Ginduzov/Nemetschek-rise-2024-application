@@ -1,18 +1,22 @@
 const Order = require("./Order");
-const Product = require("./Product");
+const Drone = require("./Drone");
 
 class Warehouse {
     constructor(x, y, name) {
         this.x = x;
         this.y = y;
         this.name = name;
-        this.products = [];
         this.orders = [];
-        this.drone = [];
+        this.drones = [];
     }
 
     addOrder(customerId, productList, customer) {
         this.orders.push(new Order([customerId, {customer}], productList));
+    }
+
+    addDrone(capacity, consumption) {
+        let drone = new Drone(capacity, consumption);
+        this.drones.push(drone);
     }
 
     absoluteValue(number){
@@ -20,7 +24,10 @@ class Warehouse {
     }
 
     async processOrders(packagingTime) {
-        console.log(`Begin delivering orders`);
+        console.log(`Continue delivery process in ${this.name} warehouse`);
+        
+        this.addDrone(500, 1);
+        console.log("Drone added to warehouse. Current drones: ", this.drones.length);
 
         let totalTime = 0;
         
@@ -31,24 +38,42 @@ class Warehouse {
         return totalTime;
     }
 
+    performDelivery(deliveryTime){
+        const consumptionForDelivery = deliveryTime * this.drones[0].consumption;
+
+        for(let i = 0; i < this.drones.length; i++){
+            if ((this.drones[i].capacity - consumptionForDelivery) >= 0){
+                this.drones[i].capacity -= consumptionForDelivery;
+                console.log(`Drone ${i} is delivering the order. Current capacity: ${this.drones[i].capacity}`);
+                return;
+            }
+            console.log(`Drone capacity: ${this.drones[i].consumption}`);
+        }
+        this.addDrone(500 - consumptionForDelivery, 1);
+        console.log(`New drone added to ${this.name}. Current drones: ${this.drones.length}`);
+    }
+
     deliverOrder(orderDetails, totalTime, packagingTime) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                totalTime += packagingTime; 
-
-                console.log("Waiting to pack:");
+                console.log(`Continue delivery process in ${this.name}`);
                 
                 const customerCoordinates = orderDetails.customer.coordinates;
-                console.log(customerCoordinates);
+                const deliveryTime = packagingTime + this.absoluteValue(customerCoordinates.x - this.x) + this.absoluteValue(customerCoordinates.y - this.y);
                 
-                const deliveryTime = this.absoluteValue(customerCoordinates.x - this.x) + this.absoluteValue(customerCoordinates.y - this.y);
+                // find drone to deliver the order
+
+                this.performDelivery(deliveryTime);
+
+                console.log(`Notification to: ${orderDetails.customer.name} --> Order delivered!`);
+
                 totalTime += deliveryTime;
-                console.log("Notification to: ", orderDetails.customer.name);
-                console.log("Order delivered!");
 
                 console.log("Returning to warehouse");
                 
-                totalTime += deliveryTime;
+                totalTime += deliveryTime - packagingTime;
+
+
                 resolve(totalTime);
             }, 100);
         });

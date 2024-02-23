@@ -50,20 +50,19 @@ class SynchronousImplementationEngine{
         return map;
     }
 
-    run(){
-        const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForC.json');
-
-        const packagingTime = 5;
-
+    calculateTotalDeliveryTime(map, packagingTime){
         Promise.all([
-            twoDimentionalMap.warehouses[0].processOrders(packagingTime),
-            twoDimentionalMap.warehouses[1].processOrders( packagingTime)
+            map.warehouses[0].processOrders(packagingTime),
+            map.warehouses[1].processOrders( packagingTime)
         ]).then((warehousesTotalDeliveryTime) => {
             let totalDeliveryTime = 0;
             for(let warehouseDeliveryTime of warehousesTotalDeliveryTime){
                 totalDeliveryTime += warehouseDeliveryTime;
             }
             console.log(`Delivered all orders!\nTotal time: ${totalDeliveryTime}`);
+
+            const totalDrones = map.getTotalDrones();
+            console.log(`Total drones: ${totalDrones}`)
             
             // To Do - reduce last promise return to warehouse time
             /*let lastPromise = warehousesTotalDeliveryTime[warehousesTotalDeliveryTime.length-1];
@@ -73,8 +72,18 @@ class SynchronousImplementationEngine{
 
             console.log(`Last promise resolved with: ${lastPromise}`);*/
         });
+    }
+
+    run(){
+        const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForC.json');//C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForC.json
+
+        const packagingTime = 5;
+        //let deliveryTime = this.calculateTotalDeliveryTime(twoDimentionalMap, packagingTime);
+
+        fetch('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForC.json')
+            .then((respone) => Response.json())
+            .then((json) => console.log(json));
         
-        console.log();
     }
 }
 module.exports = SynchronousImplementationEngine;
