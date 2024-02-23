@@ -1,5 +1,5 @@
 class Drone {
-    constructor() {
+    constructor(capacity, consumption) {
         this.capacity = capacity;
         this.consumption = consumption;
     }
