@@ -1,5 +1,5 @@
 const Order = require("./Order");
-
+const Product = require("./Product");
 
 class Warehouse {
     constructor(x, y, name) {
@@ -12,11 +12,7 @@ class Warehouse {
     }
 
     addOrder(customerId, productList, customer) {
-        this.orders.push(new Order([customerId, {productList, customer}]));
-    }
-
-    getOrder(orderNumber){
-        return this.orders[orderNumber];
+        this.orders.push(new Order([customerId, {customer}], productList));
     }
 
     absoluteValue(number){
@@ -30,7 +26,6 @@ class Warehouse {
         
         for(let orderDetails of this.orders){
             totalTime = await this.deliverOrder(orderDetails, totalTime, packagingTime);
-            console.log("Returned to warehouse!");
         }
 
         return totalTime;

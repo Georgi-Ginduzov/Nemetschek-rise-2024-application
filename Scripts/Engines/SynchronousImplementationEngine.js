@@ -40,17 +40,13 @@ class SynchronousImplementationEngine{
         for (let orderData of data['orders']) {            
             let id = orderData['customerId']
             let productList = orderData['productList'];
-
             const customer = map.customers.get(id);
-            console.log(customer);
             const customerCoordinates = customer.coordinates;
             
             const warehouseMedian = this.calculateWarehouseMedian(map);
 
             map.warehouses[this.chooseWarehouse(customerCoordinates.x, customerCoordinates.y, warehouseMedian)].addOrder(id, productList, customer);
         }
-
-        // To Do - implement product addition logic
         return map;
     }
 

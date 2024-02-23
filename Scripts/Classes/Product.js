@@ -1,7 +1,7 @@
 class Product{
-    constructor(name, count){
-        this.name = name;
-        this.count = count;
+    constructor(productValuePair){
+        this.name = productValuePair[0];
+        this.count = productValuePair[1];
     }
 }
 
