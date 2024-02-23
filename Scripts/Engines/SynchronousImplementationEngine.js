@@ -59,30 +59,24 @@ class SynchronousImplementationEngine{
             for(let warehouseDeliveryTime of warehousesTotalDeliveryTime){
                 totalDeliveryTime += warehouseDeliveryTime;
             }
-            console.log(`Delivered all orders!\nTotal time: ${totalDeliveryTime}`);
+           
+            let lastReturnToWarehouse = 
+            (warehousesTotalDeliveryTime[warehousesTotalDeliveryTime.length-1] - 5) / 2;
+            totalDeliveryTime -= lastReturnToWarehouse;
+
+            console.log(`Total delivery time: ${totalDeliveryTime}`);
 
             const totalDrones = map.getTotalDrones();
-            console.log(`Total drones: ${totalDrones}`)
-            
-            // To Do - reduce last promise return to warehouse time
-            /*let lastPromise = warehousesTotalDeliveryTime[warehousesTotalDeliveryTime.length-1];
-            lastDeliveryTime = (lastPromise - packagingTime) / 2;
-
-            totalDeliveryTime -= lastPromise;
-
-            console.log(`Last promise resolved with: ${lastPromise}`);*/
+            console.log(`Total drones: ${totalDrones}`);
         });
     }
 
     run(){
-        const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForC.json');//C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForC.json
+        const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForBandA.json');
 
         const packagingTime = 5;
-        //let deliveryTime = this.calculateTotalDeliveryTime(twoDimentionalMap, packagingTime);
+        let totalDeliveryTime = this.totalDeliveryTime(twoDimentionalMap, packagingTime);
 
-        fetch('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForC.json')
-            .then((respone) => Response.json())
-            .then((json) => console.log(json));
         
     }
 }
