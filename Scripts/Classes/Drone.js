@@ -4,4 +4,4 @@ class Drone {
         this.consumption = consumption;
     }
 }
-
+module.exports = Drone;
