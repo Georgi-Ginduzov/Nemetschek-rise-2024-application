@@ -47,10 +47,13 @@ class SynchronousImplementationEngine{
 
             map.warehouses[this.chooseWarehouse(customerCoordinates.x, customerCoordinates.y, warehouseMedian)].addOrder(id, productList, customer);
         }
+
+        // Add type of drones extraction from the input
+
         return map;
     }
 
-    calculateTotalDeliveryTime(map, packagingTime){
+    deliverAllOrders(map, packagingTime){
         Promise.all([
             map.warehouses[0].processOrders(packagingTime),
             map.warehouses[1].processOrders( packagingTime)
@@ -75,7 +78,7 @@ class SynchronousImplementationEngine{
         const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForBandA.json');
 
         const packagingTime = 5;
-        let totalDeliveryTime = this.totalDeliveryTime(twoDimentionalMap, packagingTime);
+        let totalDeliveryTime = this.deliverAllOrders(twoDimentionalMap, packagingTime);
 
         
     }

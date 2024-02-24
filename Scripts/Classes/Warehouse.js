@@ -7,7 +7,8 @@ class Warehouse {
         this.y = y;
         this.name = name;
         this.orders = [];
-        this.drones = [];
+        this.idleDrones = [];
+        this.inDeliveryDrones = [];
     }
 
     addOrder(customerId, productList, customer) {
@@ -15,8 +16,8 @@ class Warehouse {
     }
 
     addDrone(capacity, consumption) {
-        let drone = new Drone(capacity, consumption);
-        this.drones.push(drone);
+        let drone = new Drone(capacity, consumption, this.x, this.y);
+        this.idleDrones.push(drone);
     }
 
     absoluteValue(number){
@@ -27,7 +28,7 @@ class Warehouse {
         console.log(`Continue delivery process in ${this.name} warehouse`);
         
         this.addDrone(500, 1);
-        console.log("Drone added to warehouse. Current drones: ", this.drones.length);
+        console.log("Drone added to warehouse. Current drones: ", this.idleDrones.length);
 
         let totalTime = 0;
         
@@ -38,20 +39,30 @@ class Warehouse {
         return totalTime;
     }
 
-    performDelivery(deliveryTime){
-        const consumptionForDelivery = deliveryTime * this.drones[0].consumption;
+    droneToPerformMovement(deliveryTime, packagingTime){
+        const consumptionForDelivery = (deliveryTime - packagingTime) * this.idleDrones[0].consumption;
 
-        for(let i = 0; i < this.drones.length; i++){
-            if ((this.drones[i].capacity - consumptionForDelivery) >= 0){
-                this.drones[i].capacity -= consumptionForDelivery;
-                console.log(`Drone ${i} is delivering the order. Current capacity: ${this.drones[i].capacity}`);
-                return;
+        for(let i = 0; i < this.idleDrones.length; i++){
+            if ((this.idleDrones[i].capacity - consumptionForDelivery) >= 0){
+                this.idleDrones[i].capacity -= consumptionForDelivery;
+                console.log(`Drone ${i} will be delivering the order. Current capacity: ${this.idleDrones[i].capacity}`);
+                
+                this.inDeliveryDrones.push(this.idleDrones[i]);
+                return this.idleDrones[i];
             }
-            console.log(`Drone capacity: ${this.drones[i].consumption}`);
         }
-        this.addDrone(500 - consumptionForDelivery, 1);
-        console.log(`New drone added to ${this.name}. Current drones: ${this.drones.length}`);
+        console.log(`New drone added to ${this.name}. Current drones: ${this.idleDrones.length}`);
+        return this.addDrone(500 - consumptionForDelivery, 1);
     }
+
+    /*returnToWarehouse(drone, movementTime){
+        const consumptionForMovement = movementTime * this.idleDrones[0].consumption;
+
+        drone.capacity -= consumptionForMovement;
+        console.log(`Drone is returning to warehouse. Current capacity: ${drone.capacity}`);
+
+        return drone;
+    }*/
 
     deliverOrder(orderDetails, totalTime, packagingTime) {
         return new Promise((resolve, reject) => {
@@ -60,16 +71,22 @@ class Warehouse {
                 
                 const customerCoordinates = orderDetails.customer.coordinates;
                 const deliveryTime = packagingTime + this.absoluteValue(customerCoordinates.x - this.x) + this.absoluteValue(customerCoordinates.y - this.y);
+                console.log(`Customer coordinates: ${customerCoordinates.x}, ${customerCoordinates.y}`);
                 
-                // find drone to deliver the order
+                console.log("Beginning delivery...");
+                
+                let deliveryDrone = this.droneToPerformMovement(deliveryTime, packagingTime);
 
-                this.performDelivery(deliveryTime);
+                deliveryDrone.move(customerCoordinates.x, customerCoordinates.y, 0);
 
                 console.log(`Notification to: ${orderDetails.customer.name} --> Order delivered!`);
 
                 totalTime += deliveryTime;
 
+                
                 console.log("Returning to warehouse");
+                
+                deliveryDrone.move(this.x, this.y, 0);
                 
                 totalTime += deliveryTime - packagingTime;
 

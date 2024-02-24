@@ -24,7 +24,7 @@ class TwoDimensionalMap{
     getTotalDrones(){
         let totalDrones = 0;
         for(let warehouse of this.warehouses){
-            totalDrones += warehouse.drones.length;
+            totalDrones += warehouse.idleDrones.length + warehouse.inDeliveryDrones.length;
         }
         return totalDrones;
     }
