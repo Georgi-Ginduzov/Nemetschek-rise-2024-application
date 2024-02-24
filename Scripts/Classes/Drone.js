@@ -8,17 +8,6 @@ class Drone {
         this.inDelivery = false;
     }
 
-    rechargeIdleDrone(drone, time){
-        const rechargingValue = (this.capacity / 20) * time;
-
-        if (drone.capacity + rechargingValue <= this.maxCapacity) {
-            drone.capacity += rechargingValue;
-        } else {
-            drone.capacity = this.maxCapacity;
-        }
-        return drone;
-    }
-
     async move(x, y, timePerUnitDistance){
         console.log(`Drone is beginning delivery to ${x}, ${y}`);
         console.log(`Drone is at x: ${this.x} and y: ${this.y}`);

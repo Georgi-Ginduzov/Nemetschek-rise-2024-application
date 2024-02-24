@@ -18,6 +18,7 @@ class Warehouse {
     addDrone(capacity, consumption) {
         let drone = new Drone(capacity, consumption, this.x, this.y);
         this.idleDrones.push(drone);
+        console.log("Drone added to idle drones array");
     }
 
     absoluteValue(number){
@@ -55,14 +56,18 @@ class Warehouse {
         return this.addDrone(500 - consumptionForDelivery, 1);
     }
 
-    /*returnToWarehouse(drone, movementTime){
-        const consumptionForMovement = movementTime * this.idleDrones[0].consumption;
+    rechargeIdleDronesForMinute(time){
+        const rechargingValue = (this.maxCapacity / 20) * time;
 
-        drone.capacity -= consumptionForMovement;
-        console.log(`Drone is returning to warehouse. Current capacity: ${drone.capacity}`);
-
-        return drone;
-    }*/
+        for(let drone of this.idleDrones){
+            if (drone.capacity + rechargingValue <= this.maxCapacity) {
+                drone.capacity += rechargingValue;
+            } else {
+                drone.capacity = this.maxCapacity;
+            }
+        }
+        return idleDrones;
+    }
 
     deliverOrder(orderDetails, totalTime, packagingTime) {
         return new Promise((resolve, reject) => {
@@ -72,24 +77,29 @@ class Warehouse {
                 const customerCoordinates = orderDetails.customer.coordinates;
                 const deliveryTime = packagingTime + this.absoluteValue(customerCoordinates.x - this.x) + this.absoluteValue(customerCoordinates.y - this.y);
                 console.log(`Customer coordinates: ${customerCoordinates.x}, ${customerCoordinates.y}`);
-                
-                console.log("Beginning delivery...");
-                
-                let deliveryDrone = this.droneToPerformMovement(deliveryTime, packagingTime);
 
-                deliveryDrone.move(customerCoordinates.x, customerCoordinates.y, 0);
+                console.log("Beginning delivery...");
+                let deliveryDrone = this.droneToPerformMovement(deliveryTime, packagingTime);
+                this.inDeliveryDrones.push(deliveryDrone);
+
+                deliveryDrone.move(customerCoordinates.x, customerCoordinates.y, 1);
 
                 console.log(`Notification to: ${orderDetails.customer.name} --> Order delivered!`);
+
+                this.rechargeIdleDronesForMinute(deliveryTime / 60);
 
                 totalTime += deliveryTime;
 
                 
+                
                 console.log("Returning to warehouse");
                 
-                deliveryDrone.move(this.x, this.y, 0);
+                deliveryDrone.move(this.x, this.y, 1);
                 
                 totalTime += deliveryTime - packagingTime;
 
+                this.inDeliveryDrones.filter(d => d !== deliveryDrone);
+                this.idleDrones.push(deliveryDrone);
 
                 resolve(totalTime);
             }, 100);
