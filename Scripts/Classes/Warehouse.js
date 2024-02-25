@@ -30,6 +30,8 @@ class Warehouse {
         return number < 0 ? number * -1 : number;
     }
 
+    
+
     async processOrders(packagingTime, droneType) {
         try {
             //console.log(`Begin delivery process in ${this.name}`);
