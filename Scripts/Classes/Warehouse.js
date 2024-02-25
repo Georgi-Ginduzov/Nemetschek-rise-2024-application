@@ -9,55 +9,65 @@ class Warehouse {
         this.orders = [];
         this.idleDrones = [];
         this.inDeliveryDrones = [];
+        this.typesOfDrones = [];
     }
 
     addOrder(customerId, productList, customer) {
         this.orders.push(new Order([customerId, {customer}], productList));
     }
 
+    addDroneType(capacity, consumption) {
+        this.typesOfDrones.push({capacity, consumption});
+    }
+
     addDrone(capacity, consumption) {
         let drone = new Drone(capacity, consumption, this.x, this.y);
         this.idleDrones.push(drone);
-        console.log("Drone added to idle drones array");
+        return drone;
     }
 
     absoluteValue(number){
         return number < 0 ? number * -1 : number;
     }
 
-    async processOrders(packagingTime) {
-        console.log(`Continue delivery process in ${this.name} warehouse`);
-        
-        this.addDrone(500, 1);
-        console.log("Drone added to warehouse. Current drones: ", this.idleDrones.length);
+    async processOrders(packagingTime, droneType) {
+        try {
+            //console.log(`Begin delivery process in ${this.name}`);
 
-        let totalTime = 0;
-        
-        for(let orderDetails of this.orders){
-            totalTime = await this.deliverOrder(orderDetails, totalTime, packagingTime);
+
+            this.addDrone(droneType.capacity, droneType.consumption);
+            //console.log("Drone added to warehouse. Current drones: ", this.idleDrones.length);
+            //console.log("Drone added to warehouse. Current drones: ", this.idleDrones.length);
+
+            let totalTime = 0;
+            
+            for(let orderDetails of this.orders){
+                totalTime = await this.deliverOrder(orderDetails, totalTime, packagingTime, droneType);
+            }
+
+            return totalTime;
+        } catch (err) {
+            console.log(err);
         }
-
-        return totalTime;
     }
 
-    droneToPerformMovement(deliveryTime, packagingTime){
-        const consumptionForDelivery = (deliveryTime - packagingTime) * this.idleDrones[0].consumption;
+    droneToPerformMovement(deliveryTime, packagingTime, droneType){
+        const consumptionForDeliveryAndReturning = ((deliveryTime * 2) + packagingTime) * droneType.consumption;
 
         for(let i = 0; i < this.idleDrones.length; i++){
-            if ((this.idleDrones[i].capacity - consumptionForDelivery) >= 0){
-                this.idleDrones[i].capacity -= consumptionForDelivery;
-                console.log(`Drone ${i} will be delivering the order. Current capacity: ${this.idleDrones[i].capacity}`);
+            if ((this.idleDrones[i].capacity - consumptionForDeliveryAndReturning) >= 0){
+                this.idleDrones[i].capacity -= consumptionForDeliveryAndReturning;
+                //console.log(`Drone ${i} will be delivering the order. Current capacity: ${this.idleDrones[i].capacity}`);
                 
-                this.inDeliveryDrones.push(this.idleDrones[i]);
                 return this.idleDrones[i];
             }
         }
-        console.log(`New drone added to ${this.name}. Current drones: ${this.idleDrones.length}`);
-        return this.addDrone(500 - consumptionForDelivery, 1);
+        //console.log(`New drone added to ${this.name}. Current drones: ${this.idleDrones.length}`);
+        return this.addDrone(droneType.maxCapacity - consumptionForDeliveryAndReturning, 1);
     }
 
-    rechargeIdleDronesForMinute(time){
-        const rechargingValue = (this.maxCapacity / 20) * time;
+    rechargeIdleDronesForMinute(){
+        const rechargingValue = (this.maxCapacity / 20);
 
         for(let drone of this.idleDrones){
             if (drone.capacity + rechargingValue <= this.maxCapacity) {
@@ -66,48 +76,42 @@ class Warehouse {
                 drone.capacity = this.maxCapacity;
             }
         }
-        return idleDrones;
     }
 
-    deliverOrder(orderDetails, totalTime, packagingTime) {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                console.log(`Continue delivery process in ${this.name}`);
+    deliverOrder(orderDetails, totalTime, packagingTime, droneType) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                //console.log(`Continue delivery process in ${this.name}`);
                 
                 const customerCoordinates = orderDetails.customer.coordinates;
                 const deliveryTime = packagingTime + this.absoluteValue(customerCoordinates.x - this.x) + this.absoluteValue(customerCoordinates.y - this.y);
-                console.log(`Customer coordinates: ${customerCoordinates.x}, ${customerCoordinates.y}`);
 
-                console.log("Beginning delivery...");
-                let deliveryDrone = this.droneToPerformMovement(deliveryTime, packagingTime);
+                //console.log("Beginning delivery...");
+                let deliveryDrone = this.droneToPerformMovement(deliveryTime, packagingTime, droneType);
+                this.idleDrones = this.idleDrones.filter(d => d !== deliveryDrone);
                 this.inDeliveryDrones.push(deliveryDrone);
 
-                deliveryDrone.move(customerCoordinates.x, customerCoordinates.y, 1);
+                await deliveryDrone.move(customerCoordinates.x, customerCoordinates.y, 2, this);
 
-                console.log(`Notification to: ${orderDetails.customer.name} --> Order delivered!`);
-
-                this.rechargeIdleDronesForMinute(deliveryTime / 60);
+                console.log(`Notification to: ${orderDetails.customer.name} --> Order delivered! Drone won't wait for the customer to take the order.`);
 
                 totalTime += deliveryTime;
-
++
+                //console.log("Returning to warehouse");
                 
-                
-                console.log("Returning to warehouse");
-                
-                deliveryDrone.move(this.x, this.y, 1);
+                await deliveryDrone.move(this.x, this.y, 2, this);
                 
                 totalTime += deliveryTime - packagingTime;
 
-                this.inDeliveryDrones.filter(d => d !== deliveryDrone);
+                this.inDeliveryDrones = this.inDeliveryDrones.filter(d => d !== deliveryDrone);
                 this.idleDrones.push(deliveryDrone);
 
                 resolve(totalTime);
-            }, 100);
+            } catch (err) {
+                reject(err);
+            }
         });
-        
-        // To do: reject
     }
-    
 }
 
 module.exports = Warehouse;

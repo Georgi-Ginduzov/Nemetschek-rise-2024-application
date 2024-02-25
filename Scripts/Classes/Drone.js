@@ -8,29 +8,43 @@ class Drone {
         this.inDelivery = false;
     }
 
-    async move(x, y, timePerUnitDistance){
-        console.log(`Drone is beginning delivery to ${x}, ${y}`);
-        console.log(`Drone is at x: ${this.x} and y: ${this.y}`);
-        this.inDelivery = true;
-        let dx = x > this.x ? 1 : -1;
-        let dy = y > this.y ? 1 : -1;
-
-        while (this.x !== x || this.y !== y) {
-            if (this.x !== x) {
-                await this.moveOneStep(dx, 0, timePerUnitDistance);
+    async move(x, y, timePerUnitDistance, warehouse){
+        if (this.inDelivery) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    this.move(x, y, timePerUnitDistance, warehouse).then(resolve).catch(reject);
+                }, timePerUnitDistance);
+            });
+        }
+    
+        try{
+            this.inDelivery = true;
+    
+            while (this.x !== x || this.y !== y) {
+                let dx = x > this.x ? 1 : -1;
+                let dy = y > this.y ? 1 : -1;
+    
+                if (this.x !== x) {
+                    await this.moveOneStep(dx, 0, timePerUnitDistance, warehouse);
+                }
+                if (this.y !== y) {
+                    await this.moveOneStep(0, dy, timePerUnitDistance, warehouse);
+                }
             }
-            if (this.y !== y) {
-                await this.moveOneStep(0, dy, timePerUnitDistance);
-            }
+        } catch (err) {
+            console.log(err);
+        } finally {
+            this.inDelivery = false;
         }
     }
 
-    moveOneStep(dx, dy, timePerUnitDistance){
+    moveOneStep(dx, dy, timePerUnitDistance, warehouse){
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 this.x += dx;
                 this.y += dy;
-                
+
+                warehouse.rechargeIdleDronesForMinute();
                 resolve();
             }, timePerUnitDistance);
         });
