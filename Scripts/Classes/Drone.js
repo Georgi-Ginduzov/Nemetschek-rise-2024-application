@@ -42,7 +42,9 @@ class Drone {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 this.x += dx;
+                this.capacity -= this.consumption;
                 this.y += dy;
+                this.capacity -= this.consumption;
 
                 warehouse.rechargeIdleDronesForMinute();
                 resolve();
