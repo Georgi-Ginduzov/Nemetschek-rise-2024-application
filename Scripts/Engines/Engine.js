@@ -1,6 +1,6 @@
 const TwoDimensionalMap = require('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/TwoDimensionalMap.js');
 
-class SynchronousImplementationEngine{
+class Engine{
     constructor(){
         
     }
@@ -48,7 +48,9 @@ class SynchronousImplementationEngine{
         const map = new TwoDimensionalMap(data['map-top-right-coordinate'], data['output']);
 
         for (let warehouse of data['warehouses']) {
-            map.addWarehouse(warehouse['x'], warehouse['y'], warehouse['name']);
+            let time = data['output']['minutes']['real'] / data['output']['minutes']['program'];
+            console.log("Time: ", time);
+            map.addWarehouse(warehouse['x'], warehouse['y'], warehouse['name'], time);
         }
 
         for (let customer of data['customers']) {
@@ -129,11 +131,12 @@ class SynchronousImplementationEngine{
     }
 
     async run(){
-        const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForD.json');
+        const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/json/Tests/InputExampleForD.json');
         const packagingTime = 5;
         let totalDeliveryTime = [];
         let i = 0;
 
+        console.log("Warehouses: ", twoDimentionalMap.warehouses);
         if(twoDimentionalMap.output.poweredOn === true){
             let i = 0;
             for (let droneType of twoDimentionalMap.warehouses[0].typesOfDrones) {
@@ -161,4 +164,4 @@ class SynchronousImplementationEngine{
                 
     }
 }
-module.exports = SynchronousImplementationEngine;
+module.exports = Engine;
