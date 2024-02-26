@@ -1,7 +1,7 @@
-const Warehouse = require('./Warehouse.js');
-const Customer = require('./Customer.js');
+import Warehouse from './Warehouse.js';
+import Customer from './Customer.js';
 
-class TwoDimensionalMap{
+export default class TwoDimensionalMap{
     constructor(coordinates, output){
         this.coordinates = coordinates;
         this.output = output;
@@ -30,5 +30,3 @@ class TwoDimensionalMap{
         return totalDrones;
     }
 }
-
-module.exports = TwoDimensionalMap;

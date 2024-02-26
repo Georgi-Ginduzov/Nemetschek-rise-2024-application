@@ -1,13 +1,14 @@
-const Order = require("./Order");
-const Drone = require("./Drone");
+import Order from "./Order.js";
+import Drone from "./Drone.js";
 
-class Warehouse {
+export default class Warehouse {
     constructor(x, y, name, time) {
         this.x = x;
         this.y = y;
         this.name = name;
         this.time = time;
-        this.orders = [];
+        this.orders = [];// to be delivered, already delivered, currently in delivery
+        this.finishedOrders = [];
         this.idleDrones = [];
         this.inDeliveryDrones = [];
         this.typesOfDrones = [];
@@ -29,6 +30,15 @@ class Warehouse {
 
     absoluteValue(number){
         return number < 0 ? number * -1 : number;
+    }
+  
+    seeStatus(){
+        console.log(`Warehouse: ${this.name}`);
+        console.log(`Orders: ${this.orders.length}`);
+        console.log(`Idle drones: ${this.idleDrones.length}`);
+        console.log(`In delivery drones: ${this.inDeliveryDrones.length}`);
+        console.log(`Types of drones: ${this.typesOfDrones.length}`);
+    
     }
 
     synchronousProcessOrders(packagingTime, droneType) {
@@ -151,5 +161,3 @@ class Warehouse {
         });
     }
 }
-
-module.exports = Warehouse;

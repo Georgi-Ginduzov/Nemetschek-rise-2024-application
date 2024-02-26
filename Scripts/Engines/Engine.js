@@ -1,4 +1,5 @@
-const TwoDimensionalMap = require('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/TwoDimensionalMap.js');
+import TwoDimensionalMap from 'file:///C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/TwoDimensionalMap.js';
+import fs from 'node:fs';        
 
 export default class Engine{
     constructor(){
@@ -6,7 +7,14 @@ export default class Engine{
     }
 
     parseInput(address){
-        const fs = require('fs');
+        /*try{
+            let response = await fetch(address);
+            if (!response.ok) {
+                throw new Error(`Error fetching data: ${response.statusText}`);
+            }
+            const data = await response.json();
+            return data;
+        }*/
         let rawData = fs.readFileSync(address);
         let data = JSON.parse(rawData);
 
@@ -39,17 +47,35 @@ export default class Engine{
         return x + y <= warehouseMedian ? 0 : 1;
     }
 
+    /*async addOrdersFromFile(filePath, twoDimentionalMap) {
+        if (!fs.existsSync(filePath)) {
+          return;
+        }
+      
+        const fs = require('fs');
+        const jsonData = JSON.parse(fs.readFileSync(filePath));
+      
+        const newOrders = jsonData.orders.map(orderData => {
+          const customerId = orderData.customerId;
+          const productList = orderData.productList;
+      
+          return new Order(customerId,  /*customer object , productList);
+        });
+      
+        for (const warehouse of this.map.warehouses) {
+          warehouse.orders.push(...newOrders);
+        }
+      
+        await this.processOrders();
+      }*/
+      
     async assignValuesFromJson(address){
-
-        //const data = await fetchData("your_file.json");
-      //console.log(data); // Your JSON data
-        const data = await this.fetchData(address)//this.parseInput(address);
+        const data = this.parseInput(address);//await this.fetchData(address)//
         
         const map = new TwoDimensionalMap(data['map-top-right-coordinate'], data['output']);
 
         for (let warehouse of data['warehouses']) {
             let time = data['output']['minutes']['real'] / data['output']['minutes']['program'];
-            console.log("Time: ", time);
             map.addWarehouse(warehouse['x'], warehouse['y'], warehouse['name'], time);
         }
 
@@ -132,12 +158,29 @@ export default class Engine{
     }
 
     async run(){
-        const twoDimentionalMap = await this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/json/Tests/InputExampleForD.json');
+        let twoDimentionalMap = await this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/json/Tests/InputExampleForD.json');
         const packagingTime = 5;
         let totalDeliveryTime = [];
         let i = 0;
 
-        console.log("Warehouses: ", twoDimentionalMap.warehouses);
+        //const userInputPath = 'C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/json/NewOrders.json';
+
+        //let userInput = fs.existsSync(userInputPath) ? JSON.parse(fs.readFileSync(userInputPath)) : {};
+
+        /*if (Object.keys(userInput).length > 0) {
+            // Extract order data from user input (adjust logic based on your data structure)
+            const newOrders = userInput.orders.map(orderData => ({
+            customerId: orderData.customerId,
+            productList: orderData.productList,
+            }));
+
+            // Add new orders to warehouses and process them
+            for (const warehouse of this.map.warehouses) {
+            warehouse.orders.push(...newOrders);
+            }
+            await this.processOrders();
+        }*/
+
         if(twoDimentionalMap.output.poweredOn === true){
             let i = 0;
             for (let droneType of twoDimentionalMap.warehouses[0].typesOfDrones) {
@@ -154,7 +197,6 @@ export default class Engine{
                     let deliveryResult = warehouse.synchronousProcessOrders(packagingTime, droneType);
                     console.log("delivery result", deliveryResult);
                     totalTime += deliveryResult.totalTime;
-                    //totalDeliveryTime[i] = deliveryResult.totalTime;
                     totalDrones += deliveryResult.totalDrones;
                 }
                 console.log(`Total delivery time: ${totalTime}\nTotal drones performed deliveries: ${totalDrones}`);
@@ -162,7 +204,8 @@ export default class Engine{
                 console.log();
             }
         }
+
+        console.log("success")
                 
     }
 }
-module.exports = Engine;

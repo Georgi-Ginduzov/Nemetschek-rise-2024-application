@@ -1,4 +1,4 @@
-const Engine = require('./Engines/Engine.js');
+import Engine from "./Engines/Engine.js";
 
 let engine = new Engine();
 

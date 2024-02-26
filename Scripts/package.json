@@ -1,0 +1,16 @@
+{
+  "name": "web-socket",
+  "version": "1.0.0",
+  "description": "simple web socket",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "ws": "^8.16.0"
+  }
+}

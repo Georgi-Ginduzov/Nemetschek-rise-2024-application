@@ -1,6 +1,5 @@
-const Product = require("./Product");
-
-class Order{
+import Product from "./Product.js";
+export default class Order{
     constructor([customerId, {customer}], productList){
         this.customerId = customerId;
         this.productList = [];
@@ -13,4 +12,3 @@ class Order{
     }
 
 }
-module.exports = Order;

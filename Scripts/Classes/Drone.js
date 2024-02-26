@@ -1,4 +1,4 @@
-class Drone {
+export default class Drone {
     constructor(capacity, consumption, warehouseX, warehouseY) {
         this.capacity = capacity;
         this.maxCapacity = capacity;
@@ -53,4 +53,3 @@ class Drone {
     }
     
 }
-module.exports = Drone;
