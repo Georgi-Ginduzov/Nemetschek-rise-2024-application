@@ -1,6 +1,6 @@
 const TwoDimensionalMap = require('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/TwoDimensionalMap.js');
 
-class Engine{
+export default class Engine{
     constructor(){
         
     }
@@ -13,22 +13,19 @@ class Engine{
         return data;
     }
 
-    getTodos = (url, callBack) => {
-        const request = new XMLHttpRequest();
-
-        request.addEventListener('readystatechange', () => {
-            if (request.readyState === 4 && request.status === 200) {
-                const data = JSON.parse(request.responseText);
-                callBack(undefined, data);
-            } else if (request.readyState === 4) {
-                callBack('could not fetch data', undefined);
-            }
-        });
-
-        request.open('GET', url);
-        request.send();
-    }
-    
+    async fetchData(path) {
+        try {
+          const response = await fetch(path);
+          if (!response.ok) {
+            throw new Error(`Error fetching data: ${response.statusText}`);
+          }
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      }
+      
 
     calculateWarehouseMedian(map){
         const firstWarehouseCoordinatesSum = map.warehouses[0].x + map.warehouses[0].y;
@@ -42,8 +39,11 @@ class Engine{
         return x + y <= warehouseMedian ? 0 : 1;
     }
 
-    assignValuesFromJson(address){
-        const data = this.parseInput(address);
+    async assignValuesFromJson(address){
+
+        //const data = await fetchData("your_file.json");
+      //console.log(data); // Your JSON data
+        const data = await this.fetchData(address)//this.parseInput(address);
         
         const map = new TwoDimensionalMap(data['map-top-right-coordinate'], data['output']);
 
@@ -102,8 +102,9 @@ class Engine{
         return averageDeliveryTime;
     }
 
-    deliverAllOrdersByCertainDroneType(map, packagingTime, droneType){
+    async deliverAllOrdersByCertainDroneType(map, packagingTime, droneType){
         console.log(`Delivering all orders with ${droneType.capacity} capacity and ${droneType.consumption} consumption`);
+
         return Promise.all([
             map.warehouses[0].processOrders(packagingTime, droneType),
             map.warehouses[1].processOrders(packagingTime, droneType)
@@ -131,7 +132,7 @@ class Engine{
     }
 
     async run(){
-        const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/json/Tests/InputExampleForD.json');
+        const twoDimentionalMap = await this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/json/Tests/InputExampleForD.json');
         const packagingTime = 5;
         let totalDeliveryTime = [];
         let i = 0;
