@@ -2,10 +2,11 @@ const Order = require("./Order");
 const Drone = require("./Drone");
 
 class Warehouse {
-    constructor(x, y, name) {
+    constructor(x, y, name, time) {
         this.x = x;
         this.y = y;
         this.name = name;
+        this.time = time;
         this.orders = [];
         this.idleDrones = [];
         this.inDeliveryDrones = [];
@@ -30,7 +31,42 @@ class Warehouse {
         return number < 0 ? number * -1 : number;
     }
 
-    
+    synchronousProcessOrders(packagingTime, droneType) {
+        this.idleDrones.length = 0;
+        this.addDrone(droneType.capacity, droneType.consumption);
+
+        let totalTime = 0;
+        
+        for(let orderDetails of this.orders){
+            totalTime += this.synchronousOrderDelivery(orderDetails, 0, packagingTime, droneType);
+            console.log("Retrurned to warehouse. Current time: ", totalTime);
+        }
+
+        return { totalTime: totalTime, totalDrones: this.idleDrones.length };
+    }
+
+    synchronousOrderDelivery(orderDetails, totalTime, packagingTime, droneType) {
+        const customerCoordinates = orderDetails.customer.coordinates;
+        const deliveryTime = packagingTime + this.absoluteValue(customerCoordinates.x - this.x) + this.absoluteValue(customerCoordinates.y - this.y);
+        console.log("Expected delivery time: ", deliveryTime);
+
+        console.log("Beginning delivery...");
+        let deliveryDrone = this.droneToPerformMovement(deliveryTime, packagingTime, droneType);
+        deliveryDrone.capacity = deliveryDrone.capacity - deliveryTime * droneType.consumption;
+
+        totalTime += deliveryTime;
+
+        console.log(`Notification to: ${orderDetails.customer.name} --> Order delivered! Drone won't wait for the customer to take the order.`);
+
+        console.log("Returning to warehouse");
+        
+        deliveryDrone.capacity = deliveryDrone.capacity - (deliveryTime - packagingTime) * droneType.consumption;
+        totalTime += deliveryTime - packagingTime;
+
+        console.log("Returned to warehouse. Current time: ", totalTime);
+
+        return totalTime;
+    }
 
     async processOrders(packagingTime, droneType) {
         try {
@@ -54,7 +90,7 @@ class Warehouse {
     }
 
     droneToPerformMovement(deliveryTime, packagingTime, droneType){
-        const consumptionForDeliveryAndReturning = ((deliveryTime * 2) + packagingTime) * droneType.consumption;
+        const consumptionForDeliveryAndReturning = ((deliveryTime * 2) * droneType.consumption) + packagingTime;
 
         for(let i = 0; i < this.idleDrones.length; i++){
             if ((this.idleDrones[i].capacity - consumptionForDeliveryAndReturning) >= 0){
@@ -65,7 +101,7 @@ class Warehouse {
             }
         }
         //console.log(`New drone added to ${this.name}. Current drones: ${this.idleDrones.length}`);
-        return this.addDrone(droneType.maxCapacity - consumptionForDeliveryAndReturning, 1);
+        return this.addDrone(droneType.maxCapacity, droneType.consumption);
     }
 
     rechargeIdleDronesForMinute(){
@@ -93,15 +129,15 @@ class Warehouse {
                 this.idleDrones = this.idleDrones.filter(d => d !== deliveryDrone);
                 this.inDeliveryDrones.push(deliveryDrone);
 
-                await deliveryDrone.move(customerCoordinates.x, customerCoordinates.y, 2, this);
+                await deliveryDrone.move(customerCoordinates.x, customerCoordinates.y, this.time, this);
 
                 console.log(`Notification to: ${orderDetails.customer.name} --> Order delivered! Drone won't wait for the customer to take the order.`);
 
                 totalTime += deliveryTime;
-+
+
                 //console.log("Returning to warehouse");
                 
-                await deliveryDrone.move(this.x, this.y, 2, this);
+                await deliveryDrone.move(this.x, this.y, this.time, this);
                 
                 totalTime += deliveryTime - packagingTime;
 

@@ -97,7 +97,7 @@ class SynchronousImplementationEngine{
         
         const averageDeliveryTime = totalDeliveryTime / deliveryTimes.length;
 
-        console.log(`Average delivery time(if drone movements to warehouses are not counted): ${averageDeliveryTime}`);
+        return averageDeliveryTime;
     }
 
     deliverAllOrdersByCertainDroneType(map, packagingTime, droneType){
@@ -118,7 +118,7 @@ class SynchronousImplementationEngine{
     
             console.log(`Total delivery time: ${totalDeliveryTime}`);
             console.log(`Average delivery time: ${averageDeliveryTime}`);
-            console.log("Average delivery time if drone movements to warehouses are not counted: ", averageDeliveryTimeWithoutWarehousesReturn(deliveryTimes, packagingTime));
+            console.log("Average delivery time if drone movements to warehouses are not counted: ", this.averageDeliveryTimeWithoutWarehousesReturn(warehousesTotalDeliveryTime, packagingTime));
     
             const totalDrones = map.getTotalDrones();
             console.log(`Total drones performed deliveries: ${totalDrones}`);
@@ -131,19 +131,33 @@ class SynchronousImplementationEngine{
     async run(){
         const twoDimentionalMap = this.assignValuesFromJson('C:/Users/Asus/source/GitLab repos/georgi-ginduzov-nemetschek-rise-2024/Scripts/Classes/Tests/InputExampleForD.json');
         const packagingTime = 5;
+        let totalDeliveryTime = [];
+        let i = 0;
 
-        /*if(twoDimentionalMap.output.poweredOn === true){
-            let totalDeliveryTime = [];
+        if(twoDimentionalMap.output.poweredOn === true){
             let i = 0;
-            
             for (let droneType of twoDimentionalMap.warehouses[0].typesOfDrones) {
                 totalDeliveryTime[i] = await this.deliverAllOrdersByCertainDroneType(twoDimentionalMap, packagingTime, droneType);
                 i++;
             }
-        } else {*/
-            // calculate delivery time for each drone type
-            let totalDeliveryTime = twoDimentionalMap.warehouses[0].synchronousOrderDelivery(packagingTime, twoDimentionalMap.warehouses[0].typesOfDrones[0]);
-        //}
+        } else {
+            for (let droneType of twoDimentionalMap.warehouses[0].typesOfDrones) {
+                console.log(`Delivering all orders with drone type: ${droneType.capacity} capacity and ${droneType.consumption} consumption`);
+                let totalTime = 0;
+                let totalDrones = 0;
+
+                for(let warehouse of twoDimentionalMap.warehouses){
+                    let deliveryResult = warehouse.synchronousProcessOrders(packagingTime, droneType);
+                    console.log("delivery result", deliveryResult);
+                    totalTime += deliveryResult.totalTime;
+                    //totalDeliveryTime[i] = deliveryResult.totalTime;
+                    totalDrones += deliveryResult.totalDrones;
+                }
+                console.log(`Total delivery time: ${totalTime}\nTotal drones performed deliveries: ${totalDrones}`);
+                i++;
+                console.log();
+            }
+        }
                 
     }
 }

@@ -2,14 +2,15 @@ const Warehouse = require('./Warehouse.js');
 const Customer = require('./Customer.js');
 
 class TwoDimensionalMap{
-    constructor(coordinates){
+    constructor(coordinates, output){
         this.coordinates = coordinates;
+        this.output = output;
         this.warehouses = [];
         this.customers = new Map();
     }
 
-    addWarehouse(x, y, name){
-        this.warehouses.push(new Warehouse(x, y, name));
+    addWarehouse(x, y, name, time){
+        this.warehouses.push(new Warehouse(x, y, name, time));
     }
     
     addCustomer(id, name, coordinates){
