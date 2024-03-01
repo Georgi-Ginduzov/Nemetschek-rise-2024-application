@@ -3,9 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Drone Deliveries</title>
+    <link rel="stylesheet" href="/styles/chat-window.css">
 </head>
 <body>
-    <script src="/Scripts/Main.js"></script>
+
+    
+    <h1>Real Time Messaging</h1>
+    <container id="messages-window" class="messages__box-container">
+        <div class="messages__box-header">
+
+        </div>
+        <div id="messages" style="height: 400px; overflow: auto"></div>
+        <input type="text" id="messageBox" placeholder="Type your message here" style="display: block; width: 100%; margin-bottom: 10px; padding: 10px;" />
+        <button id="send" title="Send Message!" style="width: 100%; height: 30px;">Send Message</button>
+    </container>
+    <!--<h1>Drone Deliveries</h1>
+
+    <button id="disconnect" tittle="Disconnect" style="width: 40%"></button>
+
+    <div id="output"></div>
+
+    
+
+    <input type="text" id="messageInput" placeholder="Enter order"/>
+    <button id="sendButton" onclick="sendMessage()" disabled>Send</button>
+    <button onclick="onClose()">Close</button>--> 
+
+    <script> // type="module"
+        (function() {
+
+            
+
+            const sendBtn = document.querySelector('#send');
+            const messages = document.querySelector('#messages');
+            const messageBox = document.querySelector('#messageBox');
+
+            let ws;
+
+            function showMessage(message) {
+                messages.textContent += `\n\n${message}`;
+                messages.scrollDown = messages.scrollHeight;
+                messageBox.value = '';
+            }
+
+            function init() {
+                if (ws) {
+                    ws.onerror = ws.onopen = ws.close = null;
+                    ws.close();
+                }
+
+                ws = new WebSocket('ws://localhost:5500');
+                ws.onopen = () => {
+                    console.log('Connection opened!');
+                };
+                ws.onmessage = ({ data }) => showMessage(data);
+                ws.onclose = function() {
+                    ws = null;
+                };
+            }
+
+            sendBtn.onclick = function() {
+                if (!ws) {
+                    showMessage("No WebSocket connection :(");
+                    return ;
+                }
+
+                ws.send(messageBox.value);
+                showMessage(messageBox.value);
+            };
+
+            init();
+        })();
+        /*
+        const socket = new WebSocket('ws://localhost:5500');
+        const sendButton = document.getElementById("sendButton");
+
+        socket.addEventListener("open", (event) => {
+            console.log("WebSocket is opened");
+            sendButton.disabled = false;
+        });
+
+        socket.addEventListener("message", (event) => {
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerHTML += `<p>${event.data}</p>`;
+        });
+
+        socket.addEventListener("close", (event) => {
+            console.log("WebSocket connection closed");
+        });   
+        
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value;
+            socket.send(message);
+            messageInput.value = "";
+        }*/
+    </script>
 </body>
 </html>

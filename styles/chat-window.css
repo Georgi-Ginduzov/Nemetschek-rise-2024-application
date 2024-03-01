@@ -1,0 +1,16 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.messages__box-container{
+    display: block;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    background-color: green;
+    
+    margin: 0em 1em;
+    width: 40%;
+}
