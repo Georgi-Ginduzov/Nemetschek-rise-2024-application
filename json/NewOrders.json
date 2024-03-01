@@ -1,0 +1,12 @@
+{
+    "orders":
+    {
+        "customerId": 1,
+        "productList": {
+            "tomatoes": 5,
+            "cucumber": 5,
+            "cheese": 1,
+            "milk": 2
+        }
+    }
+}
